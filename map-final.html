@@ -166,7 +166,7 @@
         }
 
          /* Custom Leased Icon with label below */
-         .custom-retail-icon {
+         .custom-retail-icons {
             position: relative;
             width: 22px !important;
             height: 22px !important;
@@ -183,7 +183,7 @@
             font-family: "Outfit", sans-serif !important;
         }
 
-        .custom-retail-icon::after {
+        .custom-retail-icons::after {
             content: '';
             position: absolute;
             bottom: -6px; /* Position the triangle */
@@ -195,7 +195,7 @@
             border-right: 6px solid transparent;
             border-top: 8px solid #c4ad81; /* Orange triangle */
         }
-        .custom-pad-icon {
+        .custom-pad-icons {
             position: relative;
             width: 22px !important;
             height: 22px !important;
@@ -212,7 +212,7 @@
             font-family: "Outfit", sans-serif !important;
         }
 
-        .custom-pad-icon::after {
+        .custom-pad-icons::after {
             content: '';
             position: absolute;
             bottom: -6px; /* Position the triangle */
@@ -245,7 +245,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
         // Icons for Retail for Lease and Pads Sites for Sale/Lease
         var retailIcon = L.divIcon({
             className: 'custom-retail-icon',
-            html: 'L',
+            html: '<div class="custom-retail-icons">P</div>',
             iconSize: [30, 30],
             iconAnchor: [15, 15]
         });
@@ -259,7 +259,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
  
         var combinedIcon = L.divIcon({
             className: 'custom-pad-icon',
-            html: '<i class="fas fa-map-marker-alt"></i>',
+            html: '<div class="custom-pad-icons"><i class="fas fa-map-marker-alt"></i></div>',
             iconSize: [30, 30],
             iconAnchor: [15, 15]
         });
