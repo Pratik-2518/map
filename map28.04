@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listing Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+         body {
+            font-family: 'Outfit', sans-serif !important;
+        }
+        /* Map Container */
+        #map { 
+            height: 650px; 
+            width: 100%; 
+        }
+
+        /* Remove border-radius & margin from the popup */
+        .leaflet-popup-content-wrapper, 
+        .leaflet-popup-content {
+            border-radius: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Increased width of popup */
+        .leaflet-popup-content {
+            width: 420px !important;
+        }
+
+        /* Property Type Label */
+        .popup-type { 
+            background: #222; 
+            color: #fff; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            font-weight: bold; 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        /* Close Button */
+         .leaflet-container a.leaflet-popup-close-button {
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: transparent;
+            border: none;
+        }
+         .leaflet-container a.leaflet-popup-close-button:hover {
+          
+            color: #f2f2f2;
+            
+        }
+
+        /* Popup Content */
+        .popup-content { 
+            display: flex; 
+            background: #fff; 
+            padding: 12px;
+            align-items: center;
+        }
+
+        /* Property Image */
+        .popup-image { 
+            width: 100px; 
+            height: 70px; 
+            object-fit: cover; 
+            border: 1px solid #ddd;
+        }
+
+        /* Property Title */
+        .popup-title { 
+            font-size: 14px; 
+            font-weight: bold; 
+            flex: 1; 
+            padding-left: 12px; 
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        /* Additional Details Section */
+        .popup-details {
+            padding: 12px;
+            background: #f9f9f9;
+            font-size: 13px;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        .popup-details .subtitle {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        .popup-details ul {
+            list-style-type: disc;
+            padding-left: 16px;
+            margin: 0;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+       /* Contact Section */
+       /* Contact Section */
+.popup-contact { 
+    background: #f1f1f1; 
+    padding: 12px;
+    display: grid; /* Use grid for layout */
+    grid-template-columns: 1fr 1fr; /* 2 contacts per row */
+    gap: 16px; /* Space between contacts */
+    font-family: "Outfit", sans-serif !important;
+}
+
+.popup-contact .contact-column { 
+    display: flex;
+    flex-direction: column; 
+    gap: 8px; /* Add space between contact details */
+}
+
+/* Contact Name */
+.contact-name { 
+    font-weight: bold; 
+    font-family: "Outfit", sans-serif !important;
+}
+
+/* Contact Details */
+.contact-details { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+    font-family: "Outfit", sans-serif !important;
+}
+        /* Icons */
+        .icon { 
+            width: 14px; 
+            height: 14px; 
+        }
+  /* Actions: Directions & More Info */
+  .popup-actions { 
+            display: flex; 
+            background: #fff; 
+            border-top: 1px solid #ccc; 
+            text-align: center; 
+        }
+
+        .popup-actions a { 
+            flex: 1; 
+            font-size: 12px; 
+            cursor: pointer; 
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            display: block;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        .popup-actions a{ 
+            border-right: 1px solid #ccc; 
+            
+        }
+        .popup-actions a:last-child { 
+            border-right: none; 
+        }
+
+         /* Custom Leased Icon with label below */
+         .custom-retail-icons {
+            position: relative;
+            width: 22px !important;
+            height: 22px !important;
+            background-color: #c4ad81; /* Orange background */
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: "Outfit", Sans-serif !important;
+            border-radius: 2px 2px 0 0;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        .custom-retail-icons::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; /* Position the triangle */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #c4ad81; /* Orange triangle */
+        }
+        .custom-pad-icons {
+            position: relative;
+            width: 22px !important;
+            height: 22px !important;
+            background-color: #023C5B; /* Orange background */
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: "Outfit", Sans-serif !important;
+            border-radius:2px;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        .custom-pad-icons::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; /* Position the triangle */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #023C5B; /* Orange triangle */
+        }
+   /* Filter Control */
+        .filter-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            font-family: 'Outfit', sans-serif;
+            width: 220px;
+        }
+        
+        .filter-control h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            background-color: #fff;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .filter-select:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #023C5B;
+        }
+        
+        /* Legend Styles */
+        .map-legend {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .map-legend span {
+            font-size: 13px;
+            margin: 0 0 px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .legend-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .gold-icon {
+            background-color: #c4ad81;
+        }
+
+        .blue-icon {
+            background-color: #023C5B;
+        }
+        
+    </style>
+ 
+</head>
+<body>
+
+   
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([29.98085583407791, -96.03704147699045], 7); // Default center (can be adjusted later)
+
+        // Adding the Grayscale tile layer (CartoDB Positron style)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CartoDB</a>',
+    maxZoom: 19
+}).addTo(map);
+        
+
+        // Icons for Retail for Lease and Pads Sites for Sale/Lease
+        var retailIcon = L.divIcon({
+            className: 'custom-retail-icon',
+            html: '<div class="custom-retail-icons"></div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        var padsSiteIcon = L.divIcon({
+            className: 'custom-pads-site-icon',
+            html: '<i class="fas fa-map-marker-alt"></i>', // Using FontAwesome map marker icon
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+ 
+        var combinedIcon = L.divIcon({
+            className: 'custom-pad-icon',
+            html: '<div class="custom-pad-icons"></div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        var properties = [
+            // Retail for Lease properties
+            { 
+                lat: 29.533188, lng: -95.533756, 
+                title: "Sienna Parkway Center", 
+                type: "Retail for Lease",
+                typeClass: "retail",
+                city: "Missouri City",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/sienna-1.jpg",
+               contacts: [
+                    { name: "Anita Amin", email: "aa@blueoxgroup.com", phone: "7133248954" },
+                    { name: "Rami Khoury", email: "rk@blueoxgroup.com", phone: "8326773434" }
+                ],        
+                details: [" Brand new retail center - delivered January 2024", "Easy access to Hwy 6 and Fort Bend County Toll Rd", " Located within Sienna Plantation, a 10,500 AC master-planned community and one of Fort Bend County’s premier developments", " Major area retailers include: H-E-B, Academy, LA Fitness, Spec’s, CVS, and Memorial Hermann amongst others"],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://www.crexi.com/lease/properties/710374/texas-sienna-parkway-center" },
+                          ]
+            },
+            { 
+                lat: 29.647527, lng: -95.679546, 
+                title: "Aliana Retail Center", 
+                type: "Retail for Lease",
+                typeClass: "retail",
+                 city: "Richmond",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/aliana.webp",
+                contacts: [
+                    { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                    { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" } 
+                   
+                ],
+                details: ["This site is adjacent to Aliana,  which consists of 2,000 acres of master-planned community and includes around 4,000 single-family homes", 
+                        "Surrounded by dense residential development with 28,277 homes within a 3 mile radius", "Exposure to over 28,169 CPD", 
+                        "Primary Trade Area: Over 95,945 residents with an average household income of $146,794"],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://www.crexi.com/lease/properties/805460/texas-aliana-retail-center?recommId=2c110a9f90e08643c4249b48f94bc8ed" }
+                ]
+            },
+            { 
+                lat: 30.038644, lng: -95.603666, 
+                title: "Northpointe Retail Center", 
+                type: "Retail for Lease",
+                typeClass: "retail",
+                 city: "Tomball",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/northpoint.jpg",
+                contacts: [
+                    { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                    { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" } 
+                   
+                ],
+                details: ["High-Visibility Location: Positioned off Highway 249, adjacent to Main Event, in a high-traffic area.", 
+                "Thriving Retail Hub: Located in a dense submarket with 83,000+ residents in a 3-mile radius and an average household income of $144K."],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://www.loopnet.com/Listing/Tomball-Pkwy-Windsor-Pointe-Dr-Tomball-TX/29717811/" }
+                ]
+            },
+            { 
+                lat: 29.499712, lng: -95.048023, 
+                title: "Tuscan Lakes Marketplace (Retail & Pad Sites)", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "League City",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/tuscan-1.webp",
+                contacts: [
+                    { name: "Claire Salazar", email: "cs@blueoxgroup.com", phone: "713.574.6281" },
+                    { name: "Jack Savery", email: "js@blueoxgroup.com", phone: "713.814.4930" } 
+                   
+                ],
+                details: ["Positioned at the entrance to Tuscan Lakes, a ±870 AC master-planned community developed by Johnson Development",
+                "Adjacent to brand new ±180,000 SF Amazon logistics facility center with ±250 employees", 
+                "Major area retailers include: H-E-B, Kroger, Amazon, Buc-ees, Methodist, and LA Fitness amongst others"],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://www.crexi.com/properties/1288032/texas-pad-sites---tuscan-lakes-marketplace" },
+                    { text: "ℹ️ Retail", url: "https://www.crexi.com/lease/properties/709857/texas-tuscan-lakes-marketplace---retail-center" }
+                ]
+            },
+            { 
+                lat: 29.846547, lng: -95.855779, 
+                title: "Sunterra Shopping Center & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "Richmond",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Sunterra.webp",
+                contacts: [
+                { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" },
+                { name: "Alex Kelly", email: "alexh.kelly@jll.com", phone: "+17134251863" },
+                { name: "Karina Weathers", email: "karina.weathers@jll.com", phone: "+17132126702" }
+                   
+                ],
+                details: ["Located in the epicenter of Sunterra, a master-planned community that will feature 7,000 homes at buildout", 
+                        "Sunterra was the fastest growing community in the state of Texas in 2023 and ranked 3rd nationally",
+                        "Affluent demographics: home prices range from $300,000 to $800,000",
+                    "Very limited supply for retailers and restaurants in the submarket"],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://www.crexi.com/properties/1038516/texas-sunterra" },
+                    { text: "ℹ️ Retail", url: "https://www.crexi.com/lease/properties/624730/texas-sunterra-shopping-center" }
+                ]
+            },
+            { 
+                lat: 29.438520, lng: -95.443120, 
+                title: "Sierra Vista Retail Center & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "Alvin",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Sierrav.webp",
+                contacts: [
+                { name: "Joaquin Orozco", email: "jorozco@resolutre.com", phone: "832-919-6649" },
+                { name: "Lorenzo Neal", email: "lneal@resolutre.com", phone: "832-881-1852" },
+                { name: "Alex Kelly", email: "alexh.kelly@jll.com", phone: "+17134251863" },
+                { name: "Karina Weathers", email: "karina.weathers@jll.com", phone: "+17132126702" }                   
+                ],
+                details: ["Sierra Vista Master Planned Community is located in Brazoria County, just west of Alvin. Its commuter-friendly location near SH-288 offers a direct route to Central Houston.",
+                 "Located just west of SH 288 on CR 56 between 2 master planned communities", "Centered among 12,600+ home lots planned or under construction"],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://www.crexi.com/properties/1039616/texas-sierra-vista" },
+                    { text: "ℹ️ Retail", url: "https://resolutre.com/properties/a01Ns00000R8678IAB/" }
+                ]
+            },
+            { 
+                lat: 30.736295, lng: -97.692543, 
+                title: "Market at Sun City Retail & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "Georgetown",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Suncity-3.webp",
+                contacts: [
+                { name: " Austin Aguilar", email: "aaguilar@resolutre.com", phone: "512-921-4388" },
+                { name: "Michael Noteboom", email: "mnoteboom@resolutre.com", phone: "512-695-6958" },
+                { name: "Joey Mendez", email: "joey@resolutre.com", phone: "512-921-4071" }
+                          
+                ],
+                details: ["At the doorstep of Sun City Master Planned Community which boasts 5000+ homes", "Highway 195 is a major thoroughfare for daily traffic between Killeen and Austin MSA",
+                 "Pads will be delivered with regional detention, utilities stubbed to the site, and grade-level", "Total consumer spending within a 3 mile radius is 330M per Costar Demographics"],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://resolutre.com/properties/a01EY000000oDheYAE/" },
+                    { text: "ℹ️ Retail", url: "https://resolutre.com/properties/a01Ns00000ZKDEiIAP/" }
+                ]
+            },
+
+         
+            { 
+                lat: 30.367933, lng: -97.612766, 
+                title: "Parmer Commons Retail & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                 city: "Austin",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Parmer.webp",
+                contacts: [
+                { name: "Hutch", email: "hutch@edge-re.com", phone: "512.391.6275" },
+                { name: "John Hopkins", email: "jhopkins@edge-re.com", phone: "512.660.5050" }],
+                details: [" Signalized, high traffic intersection in a rapidly growing area of Austin ", "Close to proximity to major employers including Dell, Samsung, Tesla, Applied Materials, and more",
+                 "Less than 2 miles from Hwy 130","Surrounded by new housing developments" ],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://edge-re.com/property/pads-and-retail-space-available-in-parmer-commons/" },
+                    { text: "ℹ️ Retail", url: "https://edge-re.com/property/parmer-commons-retail/" }
+                ]
+            },
+            { 
+                lat: 30.072295, lng: -95.769340, 
+                title: " Cypress Green Retail & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "Katy",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Cypressf.webp",
+                contacts: [
+                { name: "Joaquin Orozco", email: "jorozco@resolutre.com", phone: " 832-919-6649" },
+                { name: "Lorenzo Neal", email: "lneal@resolutre.com", phone: "832-881-1852" },
+                { name: "Alex Kelly", email: "alexh.kelly@jll.com", phone: "+17134251863" }],
+                details: ["635 acre master planned community", "650 lots of 2,200 lots have been delivered", "Amenity Village and School to be built in the community","Area is experiencing tremendous growth"],
+                moreInfoLinks: [
+                    { text: "ℹ️ Pad Sites", url: "https://www.crexi.com/lease/properties/784941/texas-cypress-green" },
+                    { text: "ℹ️ Retail", url: "https://www.crexi.com/properties/1304519/cypress-green---pad-sites" }
+                ]
+            },
+            { 
+                lat: 29.469879, lng: -95.365305, 
+                title: "The Market at Meridiana",
+                type: "Retail for Lease ",
+                typeClass: "retail",
+                  city: "Manvel",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Meridiana.webp",
+                contacts: [
+                { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" },
+                { name: "Collin Lester", email: "clester@read-king.com", phone: "713.980.4749" }],
+                details: ["Signalized Intersection", "Directly across from Manvel High School with approximately 2,607 students",
+                 "Just off 288 at Meridiana Parkway, ten minutes from Pearland Town Center, with easy access north to Texas Medical Center and downtown Houston, and south to DOW and BASF",
+                "Meridiana is a 3,000 acre master planned community with ±6,900 lots and new home prices ranging from the $300s – $1Mil+"],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://www.crexi.com/lease/properties/887956/texas-the-market-at-meridiana" }
+                ]
+            },
+            { 
+                lat: 29.388872, lng: -95.427952, 
+                title: "Creekhaven Retail & Pad Sites", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                 city: "Alvin",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Creekhaven.webp",
+                contacts: [
+                { name: "Coming Soon", email: "Coming Soon", phone: "Coming Soon" }],
+                details: ["Premier Location: Our development is at highway entrance of one of Hines' meticulously planned communities, setting a new standard for luxury and convenience", 
+                "Exceptional Amenities: Residents can expect access to world-class amenities, fostering a vibrant and enriching lifestyle."],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "#" }
+                ]
+            },
+            { 
+                lat: 29.473427, lng: -95.509651, 
+                title: "The Market at Waters Lake", 
+                type: " Retail for Lease",
+                typeClass: "retail",
+                city: "Missouri City",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/The-Market-at-Waters-Lake.webp",
+                contacts: [
+                { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" },
+                { name: "Collin Lester", email: "clester@read-king.com", phone: "713.980.4749" }],
+                details: [" Easy access to Hwy 6 and Fort Bend County Toll Rd", "Located near Sienna Plantation, a 10,500 AC master planned community and one of Fort Bend County’s premier developments",
+                 "Centrally located in an underserved submarket which has 5,000 new homes planned"],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://www.crexi.com/lease/properties/887517/texas-the-market-at-waters-lake?recommId=b112e5e494e64edde15c897fe742bc29" }
+                ]
+            },
+            { 
+                lat: 29.412427, lng: -95.044159, 
+                title: "Lago Mar - Coming Soon", 
+                type: " BOTH - Retail for Lease & Pads Sites for Sale/Lease",
+                typeClass: "combined",
+                city: "Texas City",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/lagomar-1.jpg",
+                contacts: [
+                { name: "Coming Soon", email: "Coming Soon", phone: "Coming Soon" }],
+                details: ["Coming Soon"],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "#" }
+                ]
+            },
+            { 
+                lat: 30.220255, lng: -95.679919, 
+                title: "The Market at Magnolia Village", 
+                type: "Retail for Lease",
+                typeClass: "retail",
+                 city: "Magnolia",
+                state: "TX",
+                image: "https://malabarhillcapital.com/wp-content/uploads/2025/03/Magnolia.webp",
+                contacts: [
+                { name: "Matt McKinnerney", email: "mmckinnerney@read-king.com", phone: "713.980.4722" },
+                { name: "Lane Pleason", email: "Ipleason@read-king.com", phone: "713.980.4753" }],
+                details: [" Future signalized intersection on Spur 149: 1) In a rapidly growing trade area with a 5.81% projected annual growth rate (1 mile radius). 2) High household incomes and home values",
+                    "Part of Magnolia's newest retail hub: 1) Between the brand-new HEB-anchored Magnolia Place & soon-to-be-opened Lowe's Home Improvement. 2) Surrounded by numerous national/ regional franchises."],
+                moreInfoLinks: [
+                    { text: "ℹ️ More Info", url: "https://read-king.com/properties/the-market-at-magnolia" }
+                ]
+            }
+        ];
+
+        // Create a layer group to hold all markers
+        var markers = L.layerGroup().addTo(map);
+        
+        // Function to get unique cities from properties
+        function getUniqueCities() {
+            var cities = [];
+            var seen = {};
+            
+            properties.forEach(function(property) {
+                var cityState = property.city + ", " + property.state;
+                if (!seen[cityState]) {
+                    seen[cityState] = true;
+                    cities.push({
+                        city: property.city,
+                        state: property.state,
+                        display: cityState
+                    });
+                }
+            });
+            
+            // Sort alphabetically
+            cities.sort(function(a, b) {
+                return a.display.localeCompare(b.display);
+            });
+            
+            return cities;
+        }
+        
+        // Function to create markers based on filters
+        function updateMarkers(typeFilter, locationFilter) {
+            // Clear existing markers
+            markers.clearLayers();
+            
+            // Filter properties based on selected filters
+            var filteredProperties = properties;
+            
+            // Apply type filter if not 'all'
+            if (typeFilter !== 'all') {
+                filteredProperties = filteredProperties.filter(function(property) {
+                    return property.typeClass === typeFilter;
+                });
+            }
+            
+            // Apply location filter if not 'all'
+            if (locationFilter !== 'all') {
+                filteredProperties = filteredProperties.filter(function(property) {
+                    return (property.city + ", " + property.state) === locationFilter;
+                });
+            }
+            
+            // Add filtered markers to the map
+            filteredProperties.forEach(function (property) {
+                var icon;
+                if (property.typeClass === "retail") icon = retailIcon;
+                else if (property.typeClass === "padsSite") icon = padsSiteIcon;
+                else if (property.typeClass === "combined") icon = combinedIcon;
+
+                var googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${property.lat},${property.lng}`;
+                var moreInfoURLs = property.moreInfoLinks.map(link => `<a href="${link.url}" target="_blank"> ${link.text}</a>`).join("");
+
+                var detailsHTML = property.details.map(detail => `<li>${detail}</li>`).join("");
+
+                var popupContent = ` 
+                    <div class="popup-container">
+                        <div class="popup-type">
+                            ${property.type}
+                            
+                        </div>
+                        <div class="popup-content">
+                            <img class="popup-image" src="${property.image}" alt="${property.title}">
+                            <div class="popup-title">${property.title}</div>
+                        </div>
+                        <div class="popup-details">
+                            <div class="subtitle">Key Features:</div>
+                            <ul>${detailsHTML}</ul>
+                        </div>
+                         <div class="popup-contact">
+                            ${property.contacts.map((contact, index) => `
+                                <div class="contact-column">
+                                    <div class="contact-name">${contact.name}</div>
+                                    <div class="contact-details">📧 ${contact.email}</div>
+                                    <div class="contact-details">📞 ${contact.phone}</div>
+                                </div>
+                            `).join("")}
+                        </div>
+                     
+                         <div class="popup-actions">
+                            <a href="${googleMapsURL}" target="_blank">📍 Get Directions</a>
+                            ${moreInfoURLs}
+                        </div>
+                    </div>
+                `;
+
+                L.marker([property.lat, property.lng], { icon: icon })
+                    .addTo(markers)
+                    .bindPopup(popupContent);
+            });
+        }
+        
+        // Create filter control with dropdowns
+        function createFilterControl() {
+            var filterControl = L.control({position: 'topright'});
+            
+            filterControl.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'filter-control');
+                
+                // Get unique cities for dropdown
+                var cities = getUniqueCities();
+                
+                div.innerHTML = `
+                    <h3>Filter Properties</h3>
+                    <select class="filter-select" id="type-filter">
+                        <option value="all">All Property Types</option>
+                        <option value="retail">Retail for Lease</option>
+                        <option value="combined">Retail & Pad Sites</option>
+                    </select>
+                    <select class="filter-select" id="location-filter">
+                        <option value="all">All Locations</option>
+                        ${cities.map(city => `<option value="${city.display}">${city.display}</option>`).join('')}
+                    </select>
+                    
+                     <div class="map-legend">
+                        
+                        <div class="legend-item">
+                            <div class="legend-icon gold-icon"></div>
+                            <span>Retail for Lease</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon blue-icon"></div>
+                            <span>Pad Sites & Retail Available</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners to dropdowns
+                var typeFilter = div.querySelector('#type-filter');
+                var locationFilter = div.querySelector('#location-filter');
+                
+                function applyFilters() {
+                    updateMarkers(typeFilter.value, locationFilter.value);
+                }
+                
+                typeFilter.addEventListener('change', applyFilters);
+                locationFilter.addEventListener('change', applyFilters);
+                
+                return div;
+            };
+            
+            filterControl.addTo(map);
+        }
+        
+        // Initialize the map with all markers
+        updateMarkers('all', 'all');
+        createFilterControl();
+    </script>
+
+</body>
+</html>
